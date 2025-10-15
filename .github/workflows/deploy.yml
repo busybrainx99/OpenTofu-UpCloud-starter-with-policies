@@ -25,13 +25,7 @@ jobs:
 
       # Init first so the provider is installed
       - name: OpenTofu Init (no backend)
-        env:
-          UPCLOUD_USERNAME: ${{ secrets.UPCLOUD_USERNAME }}
-          UPCLOUD_PASSWORD: ${{ secrets.UPCLOUD_PASSWORD }}
-          TF_VAR_encryption_passphrase: ${{ secrets.TF_ENCRYPTION_PASSPHRASE }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.UPCLOUD_S3_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.UPCLOUD_S3_SECRET_KEY }}
-        run: tofu init -input=false
+        run: tofu init -backend=false -input=false
 
       - name: Validate
         run: tofu validate -no-color
@@ -40,7 +34,6 @@ jobs:
         env:
           UPCLOUD_USERNAME: ${{ secrets.UPCLOUD_USERNAME }}
           UPCLOUD_PASSWORD: ${{ secrets.UPCLOUD_PASSWORD }}
-          TF_VAR_encryption_passphrase: ${{ secrets.TF_ENCRYPTION_PASSPHRASE }}
         run: |
           tofu plan -out=tfplan -input=false -no-color
           tofu show -json tfplan > plan.json
@@ -76,7 +69,6 @@ jobs:
         env:
           UPCLOUD_USERNAME: ${{ secrets.UPCLOUD_USERNAME }}
           UPCLOUD_PASSWORD: ${{ secrets.UPCLOUD_PASSWORD }}
-          TF_VAR_encryption_passphrase: ${{ secrets.TF_ENCRYPTION_PASSPHRASE }}
           AWS_ACCESS_KEY_ID: ${{ secrets.UPCLOUD_S3_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.UPCLOUD_S3_SECRET_KEY }}
         run: tofu apply -auto-approve -input=false -no-color
