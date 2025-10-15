@@ -1,0 +1,80 @@
+name: Policy Check & Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  policy-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.7.3
+
+      - name: Show versions
+        run: |
+          tofu version
+          conftest --version || true
+
+      - name: Install Conftest
+        run: |
+          wget https://github.com/open-policy-agent/conftest/releases/download/v0.49.1/conftest_0.49.1_Linux_x86_64.tar.gz
+          tar xzf conftest_0.49.1_Linux_x86_64.tar.gz
+          sudo mv conftest /usr/local/bin/
+
+      - name: Format & Validate
+        run: |
+          tofu fmt -check -recursive
+          tofu validate -no-color
+
+      # No backend for the policy plan; fast and isolated
+      - name: OpenTofu Init (no backend)
+        run: tofu init -backend=false -input=false
+
+      - name: Generate Plan (JSON)
+        env:
+          UPCLOUD_USERNAME: ${{ secrets.UPCLOUD_USERNAME }}
+          UPCLOUD_PASSWORD: ${{ secrets.UPCLOUD_PASSWORD }}
+          TF_VAR_encryption_passphrase: ${{ secrets.TF_ENCRYPTION_PASSPHRASE }}
+        run: |
+          tofu plan -out=tfplan -input=false -no-color
+          tofu show -json tfplan > plan.json
+
+      - name: Run Policy Tests
+        run: conftest test plan.json -p policy/
+
+      - name: Upload plan.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: plan-json
+          path: plan.json
+
+  deploy:
+    needs: policy-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.7.3
+
+      # Backend-enabled init for real apply
+      - name: OpenTofu Init (backend enabled)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.UPCLOUD_S3_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.UPCLOUD_S3_SECRET_KEY }}
+        run: tofu init -upgrade -input=false
+
+      - name: Apply
+        env:
+          UPCLOUD_USERNAME: ${{ secrets.UPCLOUD_USERNAME }}
+          UPCLOUD_PASSWORD: ${{ secrets.UPCLOUD_PASSWORD }}
+          TF_VAR_encryption_passphrase: ${{ secrets.TF_ENCRYPTION_PASSPHRASE }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.UPCLOUD_S3_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.UPCLOUD_S3_SECRET_KEY }}
+        run: tofu apply -auto-approve -input=false -no-color
