@@ -25,7 +25,7 @@ jobs:
 
       # Init first so the provider is installed
       - name: OpenTofu Init (no backend)
-        run: tofu init -backend=false -input=false
+        run: tofu init -reconfigure -backend=false -input=false
 
       - name: Validate
         run: tofu validate -no-color
