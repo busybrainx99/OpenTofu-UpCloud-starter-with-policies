@@ -37,8 +37,8 @@ variable "labels" {
 }
 
 # Encryption
-variable "encryption_passphrase" {
-  description = "Passphrase for state encryption"
-  type        = string
-  sensitive   = true
-}
+# variable "encryption_passphrase" {
+#   description = "Passphrase for state encryption"
+#   type        = string
+#   sensitive   = true
+# }
