@@ -14,25 +14,21 @@ jobs:
         with:
           tofu_version: 1.7.3
 
-      - name: Show versions
-        run: |
-          tofu version
-          conftest --version || true
-
       - name: Install Conftest
         run: |
           wget https://github.com/open-policy-agent/conftest/releases/download/v0.49.1/conftest_0.49.1_Linux_x86_64.tar.gz
           tar xzf conftest_0.49.1_Linux_x86_64.tar.gz
           sudo mv conftest /usr/local/bin/
 
-      - name: Format & Validate
-        run: |
-          tofu fmt -check -recursive
-          tofu validate -no-color
+      - name: Format
+        run: tofu fmt -check -recursive
 
-      # No backend for the policy plan; fast and isolated
+      # Init first so the provider is installed
       - name: OpenTofu Init (no backend)
         run: tofu init -backend=false -input=false
+
+      - name: Validate
+        run: tofu validate -no-color
 
       - name: Generate Plan (JSON)
         env:
