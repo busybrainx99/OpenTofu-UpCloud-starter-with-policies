@@ -25,6 +25,8 @@ jobs:
 
       # Init first so the provider is installed
       - name: OpenTofu Init (no backend)
+        env:
+          TF_VAR_encryption_passphrase: ${{ secrets.TF_ENCRYPTION_PASSPHRASE }}
         run: tofu init -backend=false -input=false
 
       - name: Validate
