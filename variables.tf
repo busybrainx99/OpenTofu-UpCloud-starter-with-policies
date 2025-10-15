@@ -36,9 +36,9 @@ variable "labels" {
   }
 }
 
-# Encryption
-# variable "encryption_passphrase" {
-#   description = "Passphrase for state encryption"
-#   type        = string
-#   sensitive   = true
-# }
+#Encryption
+variable "encryption_passphrase" {
+  description = "Passphrase for state encryption"
+  type        = string
+  sensitive   = true
+}
