@@ -15,7 +15,7 @@ terraform {
   # Client-side encryption for state and plan (OpenTofu 1.7+)
   encryption {
     key_provider "pbkdf2" "main" {
-      passphrase = "jqdjbbqwdqu82hee872benqndi12eod2e9u2"
+      passphrase = "our-Random-Phrase" #Preferrably via environment variables
     }
 
     method "aes_gcm" "default" {
