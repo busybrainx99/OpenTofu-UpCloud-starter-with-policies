@@ -11,7 +11,7 @@ jobs:
       OPENTOFU_VERSION: 1.7.0
       CONFTEST_VERSION: 0.55.0
       AWS_REGION: de-fra1
-      TF_VAR_encryption_passphrase: ${{ secrets.TF_VAR_encryption_passphrase }}
+      TF_VAR_encryption_passphrase: "jqdjbbqwdqu82hee872benqndi12eod2e9u2"
 
     steps:
       # Checkout the repository
