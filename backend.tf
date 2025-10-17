@@ -1,10 +1,10 @@
 terraform {
   # Remote state on UpCloud Object Storage (S3-compatible)
   backend "s3" {
-    bucket                      = "opentofu-state-store-bucket" # change to your bucket
-    key                         = "default/terraform.tfstate"
-    endpoint                    = "https://838sa.upcloudobjects.com" # change to your endpoint
-    region                      = "de-fra1"                          # required by S3 API, any string
+    bucket                      = "Your-bucket-name" # change to your bucket
+    key                         = "your-preferred-key-environment/terraform.tfstate"
+    endpoint                    = "Your-bucket-endpoint" # change to your endpoint
+    region                      = "de-fra1"              # required by S3 API, any string
     skip_credentials_validation = true
     skip_metadata_api_check     = true
     skip_region_validation      = true
